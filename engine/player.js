@@ -1,6 +1,6 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
 
-export class Player {
+export class Player{
   constructor(camera, world){
     this.camera = camera;
     this.world = world;
@@ -26,25 +26,21 @@ export class Player {
 
     document.addEventListener("keydown", e=>{
       this.keys[e.code]=true;
-
       if(e.code.startsWith("Digit")){
-        let n = parseInt(e.code.slice(5));
-        if(n>=1 && n<=9) this.selectedSlot = n-1;
+        let n=parseInt(e.code.slice(5));
+        if(n>=1 && n<=9) this.selectedSlot=n-1;
         this.updateHotbar();
       }
-
       if(e.code==="KeyE"){
         this.inventoryOpen = !this.inventoryOpen;
         document.getElementById("hotbar").style.display =
-          this.inventoryOpen ? "flex" : "none";
+          this.inventoryOpen?"flex":"none";
       }
     });
 
     document.addEventListener("keyup", e=>this.keys[e.code]=false);
 
-    document.body.addEventListener("click", ()=>{
-      document.body.requestPointerLock();
-    });
+    document.body.addEventListener("click", ()=>document.body.requestPointerLock());
 
     document.addEventListener("mousemove", e=>{
       if(document.pointerLockElement!==document.body) return;
@@ -56,13 +52,11 @@ export class Player {
 
   updateHotbar(){
     const slots = document.querySelectorAll("#hotbar .slot");
-    slots.forEach((s,i)=>{
-      s.classList.toggle("selected", i===this.selectedSlot);
-    });
+    slots.forEach((s,i)=>s.classList.toggle("selected",i===this.selectedSlot));
   }
 
   update(){
-    let speed = this.keys["ControlLeft"] ? this.runSpeed : this.walkSpeed;
+    let speed = this.keys["ControlLeft"]?this.runSpeed:this.walkSpeed;
     let forward = new THREE.Vector3(Math.sin(this.yaw),0,Math.cos(this.yaw));
     let right = new THREE.Vector3(forward.z,0,-forward.x);
 
@@ -81,9 +75,7 @@ export class Player {
       this.position.y = ground;
       this.vel.y = 0;
       this.onGround = true;
-    } else {
-      this.onGround=false;
-    }
+    } else this.onGround=false;
 
     if(this.keys["Space"] && this.onGround){
       this.vel.y = this.JUMP;
@@ -94,9 +86,8 @@ export class Player {
       this.position.y+1.6,
       this.position.z
     );
-
     this.camera.rotation.order="YXZ";
-    this.camera.rotation.y = this.yaw;
-    this.camera.rotation.x = this.pitch;
+    this.camera.rotation.y=this.yaw;
+    this.camera.rotation.x=this.pitch;
   }
 }
