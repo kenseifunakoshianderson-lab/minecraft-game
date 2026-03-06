@@ -20,7 +20,7 @@ sun.position.set(100,200,100)
 scene.add(sun)
 
 const loader=new THREE.TextureLoader()
-const atlas=loader.load("./atlas.png")
+const atlas = loader.load("./textures/atlas.png")
 
 atlas.magFilter=THREE.NearestFilter
 atlas.minFilter=THREE.NearestFilter
