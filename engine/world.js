@@ -8,9 +8,11 @@ this.scene=scene
 
 this.chunks=new Map()
 
-this.CHUNK=16
+this.CHUNK_SIZE=16
 
 }
+
+
 
 key(x,z){
 
@@ -18,10 +20,14 @@ return x+","+z
 
 }
 
+
+
 update(playerPos){
 
-let cx=Math.floor(playerPos.x/this.CHUNK)
-let cz=Math.floor(playerPos.z/this.CHUNK)
+let cx=Math.floor(playerPos.x/this.CHUNK_SIZE)
+let cz=Math.floor(playerPos.z/this.CHUNK_SIZE)
+
+
 
 for(let x=-2;x<=2;x++)
 for(let z=-2;z<=2;z++){
@@ -40,22 +46,32 @@ this.chunks.set(k,chunk)
 
 }
 
+
+
 getGround(x,z){
 
 let gx=Math.floor(x)
 let gz=Math.floor(z)
 
-for(let y=256;y>-50;y--){
 
-for(let c of this.chunks.values()){
 
-if(c.hasBlock(gx,y,gz)) return y+1
+for(let y=200;y>-50;y--){
+
+for(let chunk of this.chunks.values()){
+
+if(chunk.hasBlock(gx,y,gz)){
+
+return y+1
 
 }
 
 }
 
-return -100
+}
+
+
+
+return 0
 
 }
 
