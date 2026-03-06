@@ -1,42 +1,46 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js"
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87CEEB);
+import {Player} from "./engine/player.js"
+import {World} from "./engine/world.js"
 
-const camera = new THREE.PerspectiveCamera(
+export const scene=new THREE.Scene()
+
+export const camera=new THREE.PerspectiveCamera(
 75,
 window.innerWidth/window.innerHeight,
 0.1,
 1000
-);
+)
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth,window.innerHeight);
-document.body.appendChild(renderer.domElement);
+export const renderer=new THREE.WebGLRenderer()
 
-const light = new THREE.DirectionalLight(0xffffff,1);
-light.position.set(50,100,50);
-scene.add(light);
+renderer.setSize(window.innerWidth,window.innerHeight)
 
-const geometry = new THREE.BoxGeometry(1,1,1);
-const material = new THREE.MeshLambertMaterial({color:0x55aa55});
+document.body.appendChild(renderer.domElement)
 
-for(let x=-10;x<10;x++){
-for(let z=-10;z<10;z++){
+scene.background=new THREE.Color(0x87CEEB)
 
-const cube = new THREE.Mesh(geometry,material);
-cube.position.set(x,0,z);
-scene.add(cube);
+const sun=new THREE.DirectionalLight(0xffffff,1)
+sun.position.set(100,200,100)
 
-}
-}
+scene.add(sun)
 
-camera.position.set(5,5,10);
-camera.lookAt(0,0,0);
+scene.add(new THREE.AmbientLight(0xffffff,0.4))
+
+const world=new World(scene)
+
+const player=new Player(camera,world)
 
 function animate(){
-requestAnimationFrame(animate);
-renderer.render(scene,camera);
+
+requestAnimationFrame(animate)
+
+player.update()
+
+world.update(player.position)
+
+renderer.render(scene,camera)
+
 }
 
-animate();
+animate()
