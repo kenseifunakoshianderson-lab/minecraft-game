@@ -2,14 +2,13 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Minecraft Game</title>
+<title>Minecraft Clone</title>
 <style>
 body { margin:0; overflow:hidden; }
 #crosshair{
   position:fixed; top:50%; left:50%;
   width:20px; height:20px;
-  margin-left:-10px;
-  margin-top:-10px;
+  margin-left:-10px; margin-top:-10px;
   pointer-events:none;
 }
 #crosshair:before,#crosshair:after{
@@ -18,28 +17,34 @@ body { margin:0; overflow:hidden; }
 #crosshair:before{ left:9px; top:0; width:2px; height:20px; }
 #crosshair:after{ top:9px; left:0; width:20px; height:2px; }
 
-/* ホットバー */
+/* インベントリとホットバー */
 #hotbar {
   position:fixed; bottom:20px; left:50%;
   transform:translateX(-50%);
-  display:none; gap:4px; z-index:999;
+  display:flex; gap:4px; z-index:999;
 }
-.slot {
-  width:40px; height:40px;
-  background:#333; border:2px solid white;
-}
+.slot { width:40px; height:40px; background:#333; border:2px solid white; }
 .slot.selected { border-color:yellow; }
+
+#inventory {
+  position:fixed; bottom:80px; left:50%;
+  transform:translateX(-50%);
+  display:none; grid-template-columns: repeat(9, 40px);
+  gap:4px; z-index:999;
+  background:rgba(0,0,0,0.6); padding:4px;
+  display:grid;
+}
 </style>
 </head>
 
 <body>
 <div id="crosshair"></div>
-
 <div id="hotbar">
   <div class="slot"></div><div class="slot"></div><div class="slot"></div>
   <div class="slot"></div><div class="slot"></div><div class="slot"></div>
   <div class="slot"></div><div class="slot"></div><div class="slot"></div>
 </div>
+<div id="inventory"></div>
 
 <script type="module" src="./main.js"></script>
 </body>
