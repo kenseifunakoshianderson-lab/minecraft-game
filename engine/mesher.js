@@ -3,65 +3,148 @@ import {BLOCK_COLORS} from "./blocks.js"
 
 export function buildMesh(blocks){
 
-const geometry=new THREE.BufferGeometry()
-
 const vertices=[]
 const colors=[]
 
-for(let key of blocks.keys()){
+const size=16
+const height=64
 
-let [x,y,z]=key.split(",").map(Number)
+function get(x,y,z){
 
-let type=blocks.get(key)
+const key=x+","+y+","+z
 
-let color=new THREE.Color(BLOCK_COLORS[type]||0xffffff)
-
-addCube(x,y,z,color)
-
-}
-
-function addCube(x,y,z,color){
-
-const cube=[
-[0,0,0],[1,0,0],[1,1,0],[0,1,0],
-[0,0,1],[1,0,1],[1,1,1],[0,1,1]
-]
-
-const faces=[
-[0,1,2,3],
-[5,4,7,6],
-[4,0,3,7],
-[1,5,6,2],
-[3,2,6,7],
-[4,5,1,0]
-]
-
-for(let f of faces){
-
-const v1=cube[f[0]]
-const v2=cube[f[1]]
-const v3=cube[f[2]]
-const v4=cube[f[3]]
-
-push(v1,v2,v3)
-push(v1,v3,v4)
+return blocks.get(key)||0
 
 }
 
-function push(a,b,c){
+const dims=[size,height,size]
+
+const mask=[]
+
+const x=[0,0,0]
+const q=[0,0,0]
+
+for(let d=0;d<3;d++){
+
+const u=(d+1)%3
+const v=(d+2)%3
+
+q[0]=q[1]=q[2]=0
+q[d]=1
+
+for(x[d]=-1;x[d]<dims[d];){
+
+let n=0
+
+for(x[v]=0;x[v]<dims[v];x[v]++)
+for(x[u]=0;x[u]<dims[u];x[u]++){
+
+let a,b
+
+if(x[d]>=0)
+a=get(x[0],x[1],x[2])
+else
+a=0
+
+if(x[d]<dims[d]-1)
+b=get(x[0]+q[0],x[1]+q[1],x[2]+q[2])
+else
+b=0
+
+if((!!a)==(!!b)) mask[n++]=0
+else if(a) mask[n++]=a
+else mask[n++]=-b
+
+}
+
+x[d]++
+
+n=0
+
+for(let j=0;j<dims[v];j++)
+for(let i=0;i<dims[u];){
+
+const c=mask[n]
+
+if(!c){ i++; n++; continue }
+
+let w
+for(w=1;i+w<dims[u]&&mask[n+w]==c;w++){}
+
+let h
+let done=false
+
+for(h=1;j+h<dims[v];h++){
+
+for(let k=0;k<w;k++){
+
+if(mask[n+k+h*dims[u]]!=c){
+
+done=true
+break
+
+}
+
+}
+
+if(done) break
+
+}
+
+x[u]=i
+x[v]=j
+
+const du=[0,0,0]
+const dv=[0,0,0]
+
+du[u]=w
+dv[v]=h
+
+const type=Math.abs(c)
+
+const color=new THREE.Color(BLOCK_COLORS[type]||0xffffff)
+
+const v1=[x[0],x[1],x[2]]
+const v2=[x[0]+du[0],x[1]+du[1],x[2]+du[2]]
+const v3=[x[0]+du[0]+dv[0],x[1]+du[1]+dv[1],x[2]+du[2]+dv[2]]
+const v4=[x[0]+dv[0],x[1]+dv[1],x[2]+dv[2]]
+
+if(c>0){
+
+push(v1,v2,v3,v4)
+
+}else{
+
+push(v1,v4,v3,v2)
+
+}
+
+for(let l=0;l<h;l++)
+for(let k=0;k<w;k++)
+mask[n+k+l*dims[u]]=0
+
+i+=w
+n+=w
+
+}
+
+}
+
+}
+
+function push(a,b,c,d){
 
 vertices.push(
-x+a[0],y+a[1],z+a[2],
-x+b[0],y+b[1],z+b[2],
-x+c[0],y+c[1],z+c[2]
+...a,...b,...c,
+...a,...c,...d
 )
 
-for(let i=0;i<3;i++)
+for(let i=0;i<6;i++)
 colors.push(color.r,color.g,color.b)
 
 }
 
-}
+const geometry=new THREE.BufferGeometry()
 
 geometry.setAttribute(
 "position",
