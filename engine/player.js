@@ -12,7 +12,7 @@ this.position=new THREE.Vector3(0,40,0)
 this.velY=0
 this.onGround=false
 
-this.GRAVITY=0.08
+this.GRAVITY=0.04
 this.JUMP=0.42
 
 this.walkSpeed=259/60
@@ -29,9 +29,7 @@ document.addEventListener("keyup",e=>this.keys[e.code]=false)
 
 
 document.body.addEventListener("click",()=>{
-
 document.body.requestPointerLock()
-
 })
 
 
@@ -83,6 +81,7 @@ this.position.add(right.clone().multiplyScalar(speed*0.016))
 
 
 
+// gravity
 this.velY-=this.GRAVITY
 this.position.y+=this.velY
 
@@ -104,6 +103,7 @@ this.onGround=false
 
 
 
+// jump
 if(this.keys["Space"] && this.onGround){
 
 this.velY=this.JUMP
