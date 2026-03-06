@@ -1,38 +1,98 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Clone</title>
+<title>Minecraft</title>
+
 <style>
-body { margin:0; overflow:hidden; }
+body{margin:0;overflow:hidden}
+
 #crosshair{
-  position:fixed; top:50%; left:50%;
-  width:20px; height:20px;
-  margin-left:-10px; margin-top:-10px;
-  pointer-events:none;
+position:fixed;
+top:50%;
+left:50%;
+width:20px;
+height:20px;
+margin-left:-10px;
+margin-top:-10px;
+pointer-events:none
 }
+
 #crosshair:before,#crosshair:after{
-  content:""; position:absolute; background:white;
+content:"";
+position:absolute;
+background:white
 }
-#crosshair:before{ left:9px; top:0; width:2px; height:20px; }
-#crosshair:after{ top:9px; left:0; width:20px; height:2px; }
 
-#hotbar { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:4px; z-index:999; }
-.slot { width:40px; height:40px; background:#333; border:2px solid white; }
-.slot.selected { border-color:yellow; }
+#crosshair:before{
+left:9px;
+top:0;
+width:2px;
+height:20px
+}
 
-#inventory { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); display:none; grid-template-columns: repeat(9,40px); gap:4px; background: rgba(0,0,0,0.6); padding:4px; z-index:999; display:grid; }
+#crosshair:after{
+top:9px;
+left:0;
+width:20px;
+height:2px
+}
+
+#hotbar{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+display:flex;
+gap:4px
+}
+
+.slot{
+width:40px;
+height:40px;
+background:#333;
+border:2px solid white
+}
+
+.slot.selected{
+border-color:yellow
+}
+
+#inventory{
+position:fixed;
+bottom:80px;
+left:50%;
+transform:translateX(-50%);
+display:none;
+grid-template-columns:repeat(9,40px);
+gap:4px;
+background:rgba(0,0,0,0.6);
+padding:4px
+}
 </style>
+
 </head>
 <body>
+
 <div id="crosshair"></div>
+
 <div id="hotbar">
-  <div class="slot"></div><div class="slot"></div><div class="slot"></div>
-  <div class="slot"></div><div class="slot"></div><div class="slot"></div>
-  <div class="slot"></div><div class="slot"></div><div class="slot"></div>
+<div class="slot selected"></div>
+<div class="slot"></div>
+<div class="slot"></div>
+<div class="slot"></div>
+<div class="slot"></div>
+<div class="slot"></div>
+<div class="slot"></div>
+<div class="slot"></div>
+<div class="slot"></div>
 </div>
+
 <div id="inventory"></div>
 
-<script type="module" src="./main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script src="main.js"></script>
+
 </body>
 </html>
