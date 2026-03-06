@@ -10,7 +10,7 @@ export class Player{
     this.onGround = false;
 
     this.GRAVITY = -0.08;
-    this.JUMP = 0.36; // ゆっくりジャンプ
+    this.JUMP = 0.33; // ゆっくりジャンプ
     this.FRICTION = 0.6;
 
     this.walkSpeed = 259/60;
