@@ -62,7 +62,6 @@ export class Player{
     for(let i=0;i<36;i++){
       const div = document.createElement("div");
       div.className="slot";
-      if(i<9 && i===this.selectedSlot) div.classList.add("selected");
       this.inventoryEl.appendChild(div);
     }
   }
