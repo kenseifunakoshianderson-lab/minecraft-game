@@ -1,6 +1,6 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
 
-const atlas = new THREE.TextureLoader().load("./atlas.png");
+const atlas = new THREE.TextureLoader().load("../textures/atlas.png");
 atlas.magFilter = THREE.NearestFilter;
 atlas.minFilter = THREE.NearestFilter;
 
