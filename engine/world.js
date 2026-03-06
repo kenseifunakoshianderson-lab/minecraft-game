@@ -25,13 +25,14 @@ export class World{
               const wz = (cz+z)*16+bz;
               const height = Math.floor(10 + Math.sin(wx*0.05)+Math.sin(wz*0.05)*3);
               for(let by=0;by<this.HEIGHT;by++){
-                let type=0;
+                let type = 0;
                 if(by<height){
                   if(by===height-1) type=1; // grass
                   else if(by>height-4) type=2; // dirt
                   else type=3; // stone
+                } else {
+                  type=2; // 未生成部分も dirt にして黒くならない
                 }
-                // 空の部分は0
                 blocks.set(wx+","+by+","+wz,type);
               }
             }
