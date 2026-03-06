@@ -5,6 +5,7 @@ export class World{
     this.scene = scene;
     this.chunks = new Map();
     this.CHUNK_SIZE = 16;
+    this.HEIGHT = 32;
   }
 
   key(x,z){ return x+","+z; }
@@ -18,14 +19,25 @@ export class World{
         let k = this.key(cx+x, cz+z);
         if(!this.chunks.has(k)){
           const blocks = new Map();
-          for(let bx=0;bx<16;bx++)
-            for(let bz=0;bz<16;bz++)
-              for(let by=0;by<10;by++){
-                let type = (by===9)?1: (by>6)?2:3;
-                blocks.set((cx*16+bx)+","+(by)+","+(cz*16+bz),type);
+          for(let bx=0;bx<16;bx++){
+            for(let bz=0;bz<16;bz++){
+              const wx = (cx+x)*16+bx;
+              const wz = (cz+z)*16+bz;
+              const height = Math.floor(10 + Math.sin(wx*0.05)+Math.sin(wz*0.05)*3);
+              for(let by=0;by<this.HEIGHT;by++){
+                let type=0;
+                if(by<height){
+                  if(by===height-1) type=1; // grass
+                  else if(by>height-4) type=2; // dirt
+                  else type=3; // stone
+                }
+                // 空の部分は0
+                blocks.set(wx+","+by+","+wz,type);
               }
+            }
+          }
           const mesh = buildMesh(blocks);
-          mesh.position.set(cx*16,0,cz*16);
+          mesh.position.set(0,0,0);
           this.scene.add(mesh);
           this.chunks.set(k,blocks);
         }
@@ -36,19 +48,19 @@ export class World{
   getGround(x,z){
     let gx = Math.floor(x);
     let gz = Math.floor(z);
-    let maxY = -Infinity;
+    let maxY = 0;
     for(let chunk of this.chunks.values()){
       for(let key of chunk.keys()){
         let [bx,by,bz] = key.split(",").map(Number);
-        if(bx===gx && bz===gz && by>maxY) maxY=by;
+        if(bx===gx && bz===gz && by>maxY && chunk.get(key)>0) maxY=by;
       }
     }
-    return maxY===-Infinity?0:maxY;
+    return maxY;
   }
 
   hasBlockAt(x,y,z){
     for(let chunk of this.chunks.values()){
-      if(chunk.has(x+","+y+","+z)) return true;
+      if(chunk.get(x+","+y+","+z)>0) return true;
     }
     return false;
   }
