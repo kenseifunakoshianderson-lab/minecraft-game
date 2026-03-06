@@ -5,18 +5,20 @@ atlas.magFilter = THREE.NearestFilter;
 atlas.minFilter = THREE.NearestFilter;
 
 const BLOCK_UV = {
-  1: [0,0], // 草の上
-  2: [1,0], // 土
-  3: [2,0]  // 石
+  1: [0,0], // grass top
+  2: [1,0], // dirt
+  3: [2,0]  // stone
 };
 
 export function buildMesh(blocks){
   const verts=[], uvs=[];
-  function has(x,y,z){ return blocks.has(x+","+y+","+z); }
+  function has(x,y,z){ return blocks.get(x+","+y+","+z)>0; }
 
   for(let key of blocks.keys()){
     let [x,y,z]=key.split(",").map(Number)
     let type=blocks.get(key);
+
+    if(type===0) continue;
 
     const [tx,ty] = BLOCK_UV[type]||[0,0];
     const uv0 = tx/16, uv1 = (tx+1)/16;
