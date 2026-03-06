@@ -10,7 +10,7 @@ export class Player{
     this.onGround = false;
 
     this.GRAVITY = -0.08;
-    this.JUMP = 0.42;
+    this.JUMP = 0.36; // ゆっくりジャンプ
     this.FRICTION = 0.6;
 
     this.walkSpeed = 259/60;
@@ -21,10 +21,10 @@ export class Player{
 
     this.inventory = new Array(36).fill(null);
     this.selectedSlot = 0;
-    this.inventoryOpen = false;
-
+    this.inventoryOpen = false; // 初期閉じ
     this.hotbarEl = document.getElementById("hotbar");
     this.inventoryEl = document.getElementById("inventory");
+    this.inventoryEl.style.display="none"; // 初期非表示
     this.updateHotbar();
     this.updateInventory();
 
