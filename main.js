@@ -3,24 +3,25 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.mod
 import {Player} from "./engine/player.js"
 import {World} from "./engine/world.js"
 
-export const scene=new THREE.Scene()
+const scene=new THREE.Scene()
 
-export const camera=new THREE.PerspectiveCamera(
+scene.background=new THREE.Color(0x87CEEB)
+
+const camera=new THREE.PerspectiveCamera(
 75,
 window.innerWidth/window.innerHeight,
 0.1,
 1000
 )
 
-export const renderer=new THREE.WebGLRenderer()
+const renderer=new THREE.WebGLRenderer()
 
 renderer.setSize(window.innerWidth,window.innerHeight)
 
 document.body.appendChild(renderer.domElement)
 
-scene.background=new THREE.Color(0x87CEEB)
-
 const sun=new THREE.DirectionalLight(0xffffff,1)
+
 sun.position.set(100,200,100)
 
 scene.add(sun)
