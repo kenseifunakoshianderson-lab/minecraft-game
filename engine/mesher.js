@@ -6,27 +6,8 @@ export function buildMesh(blocks){
 const vertices=[]
 const colors=[]
 
-let minX=Infinity,minY=Infinity,minZ=Infinity
-let maxX=-Infinity,maxY=-Infinity,maxZ=-Infinity
-
-for(let key of blocks.keys()){
-
-let [x,y,z]=key.split(",").map(Number)
-
-if(x<minX)minX=x
-if(y<minY)minY=y
-if(z<minZ)minZ=z
-
-if(x>maxX)maxX=x
-if(y>maxY)maxY=y
-if(z>maxZ)maxZ=z
-
-}
-
-function get(x,y,z){
-
-return blocks.get(x+","+y+","+z)||0
-
+function has(x,y,z){
+return blocks.has(x+","+y+","+z)
 }
 
 for(let key of blocks.keys()){
@@ -37,44 +18,35 @@ let type=blocks.get(key)
 
 let color=new THREE.Color(BLOCK_COLORS[type]||0xffffff)
 
-addCube(x,y,z,color)
+addFace(x,y,z,0,0,-1)
+addFace(x,y,z,0,0,1)
+addFace(x,y,z,-1,0,0)
+addFace(x,y,z,1,0,0)
+addFace(x,y,z,0,-1,0)
+addFace(x,y,z,0,1,0)
 
-}
+function addFace(x,y,z,dx,dy,dz){
 
-function addCube(x,y,z,color){
+if(has(x+dx,y+dy,z+dz)) return
 
-const cube=[
-[0,0,0],[1,0,0],[1,1,0],[0,1,0],
-[0,0,1],[1,0,1],[1,1,1],[0,1,1]
+const p=[
+[x,y,z],
+[x+1,y,z],
+[x+1,y+1,z],
+[x,y+1,z]
 ]
 
-const faces=[
-[0,1,2,3],
-[5,4,7,6],
-[4,0,3,7],
-[1,5,6,2],
-[3,2,6,7],
-[4,5,1,0]
-]
-
-for(let f of faces){
-
-const v1=cube[f[0]]
-const v2=cube[f[1]]
-const v3=cube[f[2]]
-const v4=cube[f[3]]
-
-push(v1,v2,v3)
-push(v1,v3,v4)
+push(p[0],p[1],p[2])
+push(p[0],p[2],p[3])
 
 }
 
 function push(a,b,c){
 
 vertices.push(
-x+a[0],y+a[1],z+a[2],
-x+b[0],y+b[1],z+b[2],
-x+c[0],y+c[1],z+c[2]
+a[0],a[1],a[2],
+b[0],b[1],b[2],
+c[0],c[1],c[2]
 )
 
 for(let i=0;i<3;i++)
