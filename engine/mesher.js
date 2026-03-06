@@ -1,34 +1,43 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160/build/three.module.js";
 
-export const BLOCK_COLORS = {
-  1:0x55aa55,
-  2:0x8b4513,
-  3:0x888888
+const atlas = new THREE.TextureLoader().load("./atlas.png");
+atlas.magFilter = THREE.NearestFilter;
+atlas.minFilter = THREE.NearestFilter;
+
+const BLOCK_UV = {
+  1: [0,0], // 草の上
+  2: [1,0], // 土
+  3: [2,0]  // 石
 };
 
 export function buildMesh(blocks){
-  const verts=[],cols=[];
+  const verts=[], uvs=[];
   function has(x,y,z){ return blocks.has(x+","+y+","+z); }
 
   for(let key of blocks.keys()){
     let [x,y,z]=key.split(",").map(Number)
     let type=blocks.get(key);
-    let c=new THREE.Color(BLOCK_COLORS[type]||0xffffff);
 
-    if(!has(x,y,z+1)) face([x,y,z+1],[x+1,y,z+1],[x+1,y+1,z+1],[x,y+1,z+1]);
-    if(!has(x,y,z-1)) face([x+1,y,z],[x,y,z],[x,y+1,z],[x+1,y+1,z]);
-    if(!has(x-1,y,z)) face([x,y,z],[x,y,z+1],[x,y+1,z+1],[x,y+1,z]);
-    if(!has(x+1,y,z)) face([x+1,y,z+1],[x+1,y,z],[x+1,y+1,z],[x+1,y+1,z+1]);
-    if(!has(x,y+1,z)) face([x,y+1,z],[x,y+1,z+1],[x+1,y+1,z+1],[x+1,y+1,z]);
-    if(!has(x,y-1,z)) face([x,y,z],[x+1,y,z],[x+1,y,z+1],[x,y,z+1]);
+    const [tx,ty] = BLOCK_UV[type]||[0,0];
+    const uv0 = tx/16, uv1 = (tx+1)/16;
+    const vv0 = 1-ty/16-1/16, vv1 = 1-ty/16;
 
-    function face(a,b,c,d){ push(a,b,c); push(a,c,d); }
-    function push(a,b,c){ verts.push(...a,...b,...c); for(let i=0;i<3;i++) cols.push(c.r,c.g,c.b); }
+    function addFace(a,b,c,d){
+      verts.push(...a,...b,...c,...a,...c,...d);
+      uvs.push(uv0,vv0, uv1,vv0, uv1,vv1, uv0,vv0, uv1,vv1, uv0,vv1);
+    }
+
+    if(!has(x,y,z+1)) addFace([x,y,z+1],[x+1,y,z+1],[x+1,y+1,z+1],[x,y+1,z+1]);
+    if(!has(x,y,z-1)) addFace([x+1,y,z],[x,y,z],[x,y+1,z],[x+1,y+1,z]);
+    if(!has(x-1,y,z)) addFace([x,y,z],[x,y,z+1],[x,y+1,z+1],[x,y+1,z]);
+    if(!has(x+1,y,z)) addFace([x+1,y,z+1],[x+1,y,z],[x+1,y+1,z],[x+1,y+1,z+1]);
+    if(!has(x,y+1,z)) addFace([x,y+1,z],[x,y+1,z+1],[x+1,y+1,z+1],[x+1,y+1,z]);
+    if(!has(x,y-1,z)) addFace([x,y,z],[x+1,y,z],[x+1,y,z+1],[x,y,z+1]);
   }
 
-  const g=new THREE.BufferGeometry();
+  const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.Float32BufferAttribute(verts,3));
-  g.setAttribute("color", new THREE.Float32BufferAttribute(cols,3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute(uvs,2));
   g.computeVertexNormals();
-  return new THREE.Mesh(g,new THREE.MeshLambertMaterial({vertexColors:true}));
+  return new THREE.Mesh(g,new THREE.MeshLambertMaterial({map:atlas}));
 }
