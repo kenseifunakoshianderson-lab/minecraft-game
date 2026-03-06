@@ -5,7 +5,7 @@ export class Player{
     this.camera = camera;
     this.world = world;
 
-    this.position = new THREE.Vector3(0,50,0);
+    this.position = new THREE.Vector3(0,20,0);
     this.vel = new THREE.Vector3(0,0,0);
     this.onGround = false;
 
@@ -16,33 +16,28 @@ export class Player{
     this.walkSpeed = 259/60;
     this.runSpeed = 336.72/60;
 
-    this.yaw = 0;
-    this.pitch = 0;
-    this.keys = {};
+    this.yaw=0; this.pitch=0;
+    this.keys={};
 
     this.inventory = new Array(36).fill(null);
     this.selectedSlot = 0;
     this.inventoryOpen = false;
 
-    // DOM
     this.hotbarEl = document.getElementById("hotbar");
     this.inventoryEl = document.getElementById("inventory");
     this.updateHotbar();
     this.updateInventory();
 
-    // キーイベント
     document.addEventListener("keydown", e=>{
       this.keys[e.code]=true;
-
       if(e.code.startsWith("Digit")){
         let n=parseInt(e.code.slice(5));
         if(n>=1 && n<=9) this.selectedSlot=n-1;
         this.updateHotbar();
       }
-
       if(e.code==="KeyE"){
         this.inventoryOpen = !this.inventoryOpen;
-        this.inventoryEl.style.display = this.inventoryOpen ? "grid" : "none";
+        this.inventoryEl.style.display = this.inventoryOpen?"grid":"none";
       }
     });
     document.addEventListener("keyup", e=>this.keys[e.code]=false);
@@ -73,8 +68,7 @@ export class Player{
   }
 
   update(){
-    let speed = this.keys["ControlLeft"] ? this.runSpeed : this.walkSpeed;
-
+    let speed = this.keys["ControlLeft"]?this.runSpeed:this.walkSpeed;
     const forward = new THREE.Vector3(Math.sin(this.yaw),0,Math.cos(this.yaw));
     const right = new THREE.Vector3(forward.z,0,-forward.x);
 
@@ -83,40 +77,34 @@ export class Player{
     if(this.keys["KeyA"]) this.position.add(right.clone().multiplyScalar(-speed*0.016));
     if(this.keys["KeyD"]) this.position.add(right.clone().multiplyScalar(speed*0.016));
 
-    // 重力
     this.vel.y += this.GRAVITY;
     this.vel.x *= this.FRICTION;
     this.vel.z *= this.FRICTION;
     this.position.add(this.vel);
 
-    // 衝突判定（AABB 上下）
-    const playerHeight = 1.8;
+    const playerHeight=1.8;
     const feet = this.position.clone();
-    const head = this.position.clone();
-    head.y += playerHeight;
+    const head = this.position.clone(); head.y += playerHeight;
 
     // 上方向衝突
-    if(this.vel.y>0){
-      for(let y=Math.floor(head.y);y<=Math.ceil(head.y);y++){
-        if(this.world.hasBlockAt(this.position.x, y, this.position.z)) this.vel.y=0;
-      }
+    if(this.vel.y>0 && this.world.hasBlockAt(this.position.x, Math.ceil(head.y), this.position.z)){
+      this.vel.y=0;
+      this.position.y=Math.floor(head.y)-playerHeight;
     }
 
     // 下方向衝突
-    let ground = this.world.getGround(this.position.x, this.position.z);
-    if(this.position.y <= ground){
-      this.position.y = ground;
-      this.vel.y = 0;
-      this.onGround = true;
+    let ground = this.world.getGround(this.position.x,this.position.z);
+    if(this.position.y<=ground){
+      this.position.y=ground;
+      this.vel.y=0;
+      this.onGround=true;
     } else this.onGround=false;
 
-    // ジャンプ
     if(this.keys["Space"] && this.onGround) this.vel.y=this.JUMP;
 
-    // カメラ追従
     this.camera.position.set(
       this.position.x,
-      this.position.y + 1.6,
+      this.position.y+1.6,
       this.position.z
     );
     this.camera.rotation.order="YXZ";
