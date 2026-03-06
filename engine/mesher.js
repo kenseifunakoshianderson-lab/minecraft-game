@@ -18,26 +18,68 @@ let type=blocks.get(key)
 
 let color=new THREE.Color(BLOCK_COLORS[type]||0xffffff)
 
-addFace(x,y,z,0,0,-1)
-addFace(x,y,z,0,0,1)
-addFace(x,y,z,-1,0,0)
-addFace(x,y,z,1,0,0)
-addFace(x,y,z,0,-1,0)
-addFace(x,y,z,0,1,0)
 
-function addFace(x,y,z,dx,dy,dz){
 
-if(has(x+dx,y+dy,z+dz)) return
+// FRONT
+if(!has(x,y,z+1))
+face(
+[x,y,z+1],
+[x+1,y,z+1],
+[x+1,y+1,z+1],
+[x,y+1,z+1]
+)
 
-const p=[
+// BACK
+if(!has(x,y,z-1))
+face(
+[x+1,y,z],
 [x,y,z],
+[x,y+1,z],
+[x+1,y+1,z]
+)
+
+// LEFT
+if(!has(x-1,y,z))
+face(
+[x,y,z],
+[x,y,z+1],
+[x,y+1,z+1],
+[x,y+1,z]
+)
+
+// RIGHT
+if(!has(x+1,y,z))
+face(
+[x+1,y,z+1],
 [x+1,y,z],
 [x+1,y+1,z],
-[x,y+1,z]
-]
+[x+1,y+1,z+1]
+)
 
-push(p[0],p[1],p[2])
-push(p[0],p[2],p[3])
+// TOP
+if(!has(x,y+1,z))
+face(
+[x,y+1,z],
+[x,y+1,z+1],
+[x+1,y+1,z+1],
+[x+1,y+1,z]
+)
+
+// BOTTOM
+if(!has(x,y-1,z))
+face(
+[x,y,z],
+[x+1,y,z],
+[x+1,y,z+1],
+[x,y,z+1]
+)
+
+
+
+function face(a,b,c,d){
+
+push(a,b,c)
+push(a,c,d)
 
 }
 
@@ -56,6 +98,8 @@ colors.push(color.r,color.g,color.b)
 
 }
 
+
+
 const geometry=new THREE.BufferGeometry()
 
 geometry.setAttribute(
@@ -70,7 +114,10 @@ new THREE.Float32BufferAttribute(colors,3)
 
 geometry.computeVertexNormals()
 
-const material=new THREE.MeshLambertMaterial({vertexColors:true})
+const material=new THREE.MeshLambertMaterial({
+vertexColors:true,
+side:THREE.FrontSide
+})
 
 return new THREE.Mesh(geometry,material)
 
