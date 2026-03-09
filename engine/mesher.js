@@ -5,16 +5,7 @@ const atlas = new THREE.TextureLoader().load("../textures/atlas.png")
 atlas.magFilter = THREE.NearestFilter
 atlas.minFilter = THREE.NearestFilter
 
-export function buildMesh(blocks){
-
-const verts=[]
-const uvs=[]
-
-function has(x,y,z){
-return blocks.get(x+","+y+","+z)>0
-}
-
-function faceUV(type,face){
+function tileUV(type,face){
 
 let tile
 
@@ -31,11 +22,59 @@ const v0=1-(ty+1)/16
 const v1=1-ty/16
 
 return [u0,u1,v0,v1]
+
 }
 
-function addFace(a,b,c,d,type,face){
+export function buildMesh(blocks){
 
-const [u0,u1,v0,v1]=faceUV(type,face)
+const verts=[]
+const uvs=[]
+
+function has(x,y,z){
+return blocks.get(x+","+y+","+z)>0
+}
+
+function addQuad(x,y,z,w,h,dir,type,face){
+
+const [u0,u1,v0,v1]=tileUV(type,face)
+
+let a,b,c,d
+
+if(dir=="top"){
+
+a=[x,y,z]
+b=[x+w,y,z]
+c=[x+w,y,z+h]
+d=[x,y,z+h]
+
+}
+
+if(dir=="bottom"){
+
+a=[x,y,z]
+b=[x,y,z+h]
+c=[x+w,y,z+h]
+d=[x+w,y,z]
+
+}
+
+if(dir=="north"){
+
+a=[x,y,z]
+b=[x+w,y,z]
+c=[x+w,y+h,z]
+d=[x,y+h,z]
+
+}
+
+if(dir=="south"){
+
+a=[x,y,z]
+b=[x,y+h,z]
+c=[x+w,y+h,z]
+d=[x+w,y,z]
+
+}
 
 verts.push(...a,...b,...c,...a,...c,...d)
 
@@ -51,37 +90,41 @@ u0,v1
 
 }
 
+const visited=new Set()
+
 for(let key of blocks.keys()){
+
+if(visited.has(key)) continue
 
 let [x,y,z]=key.split(",").map(Number)
 let type=blocks.get(key)
 
 if(type===0) continue
 
-if(!has(x,y,z+1))
-addFace([x,y,z+1],[x+1,y,z+1],[x+1,y+1,z+1],[x,y+1,z+1],type,"side")
+let width=1
 
-if(!has(x,y,z-1))
-addFace([x+1,y,z],[x,y,z],[x,y+1,z],[x+1,y+1,z],type,"side")
+while(blocks.get((x+width)+","+y+","+z)==type){
 
-if(!has(x-1,y,z))
-addFace([x,y,z],[x,y,z+1],[x,y+1,z+1],[x,y+1,z],type,"side")
+visited.add((x+width)+","+y+","+z)
+width++
 
-if(!has(x+1,y,z))
-addFace([x+1,y,z+1],[x+1,y,z],[x+1,y+1,z],[x+1,y+1,z+1],type,"side")
+}
 
-if(!has(x,y+1,z))
-addFace([x,y+1,z],[x,y+1,z+1],[x+1,y+1,z+1],[x+1,y+1,z],type,"top")
-
-if(!has(x,y-1,z))
-addFace([x,y,z],[x+1,y,z],[x+1,y,z+1],[x,y,z+1],type,"bottom")
+addQuad(x,y+1,z,width,1,"top",type,"top")
 
 }
 
 const g=new THREE.BufferGeometry()
 
-g.setAttribute("position",new THREE.Float32BufferAttribute(verts,3))
-g.setAttribute("uv",new THREE.Float32BufferAttribute(uvs,2))
+g.setAttribute(
+"position",
+new THREE.Float32BufferAttribute(verts,3)
+)
+
+g.setAttribute(
+"uv",
+new THREE.Float32BufferAttribute(uvs,2)
+)
 
 g.computeVertexNormals()
 
