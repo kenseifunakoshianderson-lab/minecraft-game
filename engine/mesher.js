@@ -5,7 +5,7 @@ const atlas = new THREE.TextureLoader().load("../textures/atlas.png")
 atlas.magFilter = THREE.NearestFilter
 atlas.minFilter = THREE.NearestFilter
 
-function tileUV(type,face){
+function getUV(type,face){
 
 let tile
 
@@ -30,87 +30,131 @@ export function buildMesh(blocks){
 const verts=[]
 const uvs=[]
 
-function has(x,y,z){
-return blocks.get(x+","+y+","+z)>0
+function block(x,y,z){
+return blocks.get(x+","+y+","+z)||0
 }
 
-function addQuad(x,y,z,w,h,dir,type,face){
+const dims=[16,32,16]
 
-const [u0,u1,v0,v1]=tileUV(type,face)
+const mask=[]
 
-let a,b,c,d
+for(let d=0; d<3; d++){
 
-if(dir=="top"){
+const u=(d+1)%3
+const v=(d+2)%3
 
-a=[x,y,z]
-b=[x+w,y,z]
-c=[x+w,y,z+h]
-d=[x,y,z+h]
+const x=[0,0,0]
+const q=[0,0,0]
+q[d]=1
+
+for(x[d]=-1; x[d]<dims[d]; ){
+
+let n=0
+
+for(x[v]=0; x[v]<dims[v]; x[v]++){
+for(x[u]=0; x[u]<dims[u]; x[u]++){
+
+let a=0
+let b=0
+
+if(x[d]>=0)
+a=block(x[0],x[1],x[2])
+
+if(x[d]<dims[d]-1)
+b=block(x[0]+q[0],x[1]+q[1],x[2]+q[2])
+
+if((a>0)!=(b>0))
+mask[n++]=(a>0)?a:-b
+else
+mask[n++]=0
+
+}
+}
+
+x[d]++
+n=0
+
+for(let j=0; j<dims[v]; j++){
+for(let i=0; i<dims[u]; ){
+
+const c=mask[n]
+
+if(c){
+
+let w
+for(w=1; i+w<dims[u] && mask[n+w]==c; w++){}
+
+let h
+let done=false
+
+for(h=1; j+h<dims[v]; h++){
+
+for(let k=0;k<w;k++){
+if(mask[n+k+h*dims[u]]!=c){
+done=true
+break
+}
+}
+
+if(done) break
 
 }
 
-if(dir=="bottom"){
+x[u]=i
+x[v]=j
 
-a=[x,y,z]
-b=[x,y,z+h]
-c=[x+w,y,z+h]
-d=[x+w,y,z]
+const du=[0,0,0]
+const dv=[0,0,0]
 
-}
+du[u]=w
+dv[v]=h
 
-if(dir=="north"){
+const type=Math.abs(c)
 
-a=[x,y,z]
-b=[x+w,y,z]
-c=[x+w,y+h,z]
-d=[x,y+h,z]
+let face="side"
+if(d==1 && c>0) face="top"
+if(d==1 && c<0) face="bottom"
 
-}
+const [u0,u1,v0,v1]=getUV(type,face)
 
-if(dir=="south"){
+const p=[x[0],x[1],x[2]]
 
-a=[x,y,z]
-b=[x,y+h,z]
-c=[x+w,y+h,z]
-d=[x+w,y,z]
+const v1p=[p[0],p[1],p[2]]
+const v2p=[p[0]+du[0],p[1]+du[1],p[2]+du[2]]
+const v3p=[p[0]+du[0]+dv[0],p[1]+du[1]+dv[1],p[2]+du[2]+dv[2]]
+const v4p=[p[0]+dv[0],p[1]+dv[1],p[2]+dv[2]]
 
-}
-
-verts.push(...a,...b,...c,...a,...c,...d)
+verts.push(...v1p,...v2p,...v3p,...v1p,...v3p,...v4p)
 
 uvs.push(
 u0,v0,
 u1,v0,
 u1,v1,
-
 u0,v0,
 u1,v1,
 u0,v1
 )
 
+for(let l=0;l<h;l++){
+for(let k=0;k<w;k++){
+mask[n+k+l*dims[u]]=0
+}
 }
 
-const visited=new Set()
+i+=w
+n+=w
 
-for(let key of blocks.keys()){
+}else{
 
-if(visited.has(key)) continue
-
-let [x,y,z]=key.split(",").map(Number)
-let type=blocks.get(key)
-
-if(type===0) continue
-
-let width=1
-
-while(blocks.get((x+width)+","+y+","+z)==type){
-
-visited.add((x+width)+","+y+","+z)
-width++
+i++
+n++
 
 }
 
-addQuad(x,y+1,z,width,1,"top",type,"top")
+}
+}
+
+}
 
 }
 
