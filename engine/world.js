@@ -55,13 +55,7 @@ const mesh=buildMesh(blocks)
 
 this.scene.add(mesh)
 
-this.chunks.set(
-this.key(cx,cz),
-{
-blocks:blocks,
-mesh:mesh
-}
-)
+this.chunks.set(this.key(cx,cz),blocks)
 
 }
 
@@ -70,31 +64,13 @@ update(playerPos){
 const cx=Math.floor(playerPos.x/this.CHUNK)
 const cz=Math.floor(playerPos.z/this.CHUNK)
 
-const render=3
-
-for(let x=-render;x<=render;x++)
-for(let z=-render;z<=render;z++){
+for(let x=-2;x<=2;x++)
+for(let z=-2;z<=2;z++){
 
 const k=this.key(cx+x,cz+z)
 
 if(!this.chunks.has(k))
 this.generateChunk(cx+x,cz+z)
-
-}
-
-for(let k of this.chunks.keys()){
-
-const [x,z]=k.split(",").map(Number)
-
-if(Math.abs(x-cx)>render || Math.abs(z-cz)>render){
-
-const chunk=this.chunks.get(k)
-
-this.scene.remove(chunk.mesh)
-
-this.chunks.delete(k)
-
-}
 
 }
 
@@ -108,7 +84,7 @@ z=Math.floor(z)
 
 for(let chunk of this.chunks.values()){
 
-if(chunk.blocks.get(x+","+y+","+z)>0)
+if(chunk.get(x+","+y+","+z)>0)
 return true
 
 }
