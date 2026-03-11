@@ -13,9 +13,9 @@ const x = tile % 16
 const y = Math.floor(tile / 16)
 
 const u0 = x * TILE
-const v0 = 1 - (y+1)*TILE
-const u1 = (x+1)*TILE
-const v1 = 1 - y*TILE
+const v0 = y * TILE
+const u1 = (x + 1) * TILE
+const v1 = (y + 1) * TILE
 
 return [u0,v0,u1,v1]
 
@@ -37,13 +37,13 @@ verts.push(...a,...b,...c,...a,...c,...d)
 const [u0,v0,u1,v1] = getUV(tile)
 
 uvs.push(
-u0,v0,
+u0,v1,
+u1,v1,
 u1,v0,
-u1,v1,
 
-u0,v0,
-u1,v1,
-u0,v1
+u0,v1,
+u1,v0,
+u0,v0
 )
 
 }
