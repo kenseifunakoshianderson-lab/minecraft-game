@@ -12,10 +12,10 @@ function getUV(tile){
 const x = tile % 16
 const y = Math.floor(tile / 16)
 
-const u0 = x*TILE
-const v0 = 1-(y+1)*TILE
+const u0 = x * TILE
+const v0 = 1 - (y+1)*TILE
 const u1 = (x+1)*TILE
-const v1 = 1-y*TILE
+const v1 = 1 - y*TILE
 
 return [u0,v0,u1,v1]
 
@@ -57,20 +57,25 @@ if(type===0) continue
 
 let top,side,bottom
 
-if(type===1){ // grass
-top = 0
-side = 3
-bottom = 1
+// grass
+if(type===1){
+top=0
+side=3
+bottom=1
 }
-else if(type===2){ // dirt
-top = 10
-side = 10
-bottom = 10
+
+// dirt
+if(type===2){
+top=10
+side=10
+bottom=10
 }
-else if(type===3){ // stone
-top = 2
-side = 2
-bottom = 2
+
+// stone
+if(type===3){
+top=2
+side=2
+bottom=2
 }
 
 if(!has(x,y,z+1))
