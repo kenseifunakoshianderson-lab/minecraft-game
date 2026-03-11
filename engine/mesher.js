@@ -5,22 +5,6 @@ const atlas = new THREE.TextureLoader().load("../textures/atlas.png")
 atlas.magFilter = THREE.NearestFilter
 atlas.minFilter = THREE.NearestFilter
 
-const TILE = 1/16
-
-function getUV(tile){
-
-const x = tile % 16
-const y = Math.floor(tile / 16)
-
-const u0 = x*TILE
-const v0 = 1-(y+1)*TILE
-const u1 = (x+1)*TILE
-const v1 = 1-y*TILE
-
-return [u0,v0,u1,v1]
-
-}
-
 export function buildMesh(blocks){
 
 const verts=[]
@@ -30,24 +14,6 @@ function has(x,y,z){
 return blocks.get(x+","+y+","+z)>0
 }
 
-function face(a,b,c,d,tile){
-
-verts.push(...a,...b,...c,...a,...c,...d)
-
-const [u0,v0,u1,v1] = getUV(tile)
-
-uvs.push(
-u0,v0,
-u1,v0,
-u1,v1,
-
-u0,v0,
-u1,v1,
-u0,v1
-)
-
-}
-
 for(let key of blocks.keys()){
 
 let [x,y,z]=key.split(",").map(Number)
@@ -55,41 +21,38 @@ let type=blocks.get(key)
 
 if(type===0) continue
 
-let top,side,bottom
+function face(a,b,c,d){
 
-if(type===1){ // grass
-top = 0
-side = 3
-bottom = 1
-}
-else if(type===2){ // dirt
-top = 10
-side = 10
-bottom = 10
-}
-else if(type===3){ // stone
-top = 2
-side = 2
-bottom = 2
+verts.push(...a,...b,...c,...a,...c,...d)
+
+uvs.push(
+0,0,
+1,0,
+1,1,
+0,0,
+1,1,
+0,1
+)
+
 }
 
 if(!has(x,y,z+1))
-face([x,y,z+1],[x+1,y,z+1],[x+1,y+1,z+1],[x,y+1,z+1],side)
+face([x,y,z+1],[x+1,y,z+1],[x+1,y+1,z+1],[x,y+1,z+1])
 
 if(!has(x,y,z-1))
-face([x+1,y,z],[x,y,z],[x,y+1,z],[x+1,y+1,z],side)
+face([x+1,y,z],[x,y,z],[x,y+1,z],[x+1,y+1,z])
 
 if(!has(x-1,y,z))
-face([x,y,z],[x,y,z+1],[x,y+1,z+1],[x,y+1,z],side)
+face([x,y,z],[x,y,z+1],[x,y+1,z+1],[x,y+1,z])
 
 if(!has(x+1,y,z))
-face([x+1,y,z+1],[x+1,y,z],[x+1,y+1,z],[x+1,y+1,z+1],side)
+face([x+1,y,z+1],[x+1,y,z],[x+1,y+1,z],[x+1,y+1,z+1])
 
 if(!has(x,y+1,z))
-face([x,y+1,z],[x,y+1,z+1],[x+1,y+1,z+1],[x+1,y+1,z],top)
+face([x,y+1,z],[x,y+1,z+1],[x+1,y+1,z+1],[x+1,y+1,z])
 
 if(!has(x,y-1,z))
-face([x,y,z],[x+1,y,z],[x+1,y,z+1],[x,y,z+1],bottom)
+face([x,y,z],[x+1,y,z],[x+1,y,z+1],[x,y,z+1])
 
 }
 
